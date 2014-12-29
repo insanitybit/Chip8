@@ -44,8 +44,7 @@ private:
 	bool execute();
 
 	WORD psize; // size of binary + pc
-
-    std::mt19937 gen;
+	std::mt19937 gen{std::random_device{}()};
 
 	void OP_ANNN();
 	void OP_BNNN();
