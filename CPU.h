@@ -313,7 +313,7 @@ bool CPU::decode(){
 }
 
 bool CPU::execute(){
-
+	std::cout << pc << "\n";
 	return true;
 }
 
@@ -365,7 +365,7 @@ void CPU::OP_EXA1(){
 
 // Calls RCA 1802 program at address NNN.
 void CPU::OP_0NNN(){
-
+	pc = (opcode & 0x0FFF);
 }
 
 // Clears the screen.
@@ -375,30 +375,33 @@ void CPU::OP_00E0(){
 
 // Returns from a subroutine.
 void CPU::OP_00EE(){
-
+	pc = stack.top();
+	stack.pop();
+	pc += 2;
 }
 
 // Jumps to address NNN.
 void CPU::OP_1NNN(){
-	// pc = (opcode & 0x0FFF);
+	pc = (opcode & 0x0FFF);
 }
 
+// 2NNN	Calls subroutine at NNN.
 void CPU::OP_2NNN(){
-
+	stack.push(pc);
+	pc = (opcode & 0x0FFF);
 }
 
 // Skips the next instruction if VX equals NN.
 void CPU::OP_3XNN(){
 	BYTE NN = (opcode & 0x00FF);
-	if(NN == V[((opcode >> 8) & 0x000F)])
+	if(NN == V[((opcode >> 8) & 0xF)])
 		pc += 2;
 }
 
 // 4XNN	Skips the next instruction if VX doesn't equal NN.
-
 void CPU::OP_4XNN(){
 	BYTE NN = (opcode & 0x00FF);
-	if(NN != V[((opcode >> 8) & 0x000F)])
+	if(NN != V[((opcode >> 8) & 0xF)])
 		pc += 2;
 }
 
@@ -413,86 +416,182 @@ void CPU::OP_5XY0(){
 
 // 6XNN	Sets VX to NN.
 void CPU::OP_6XNN(){
-
+	BYTE NN = opcode & 0x00FF;
+	BYTE X  = (opcode >> 8) & 0x000F;
+	V[X] = NN;
 }
 
 // 7XNN	Adds NN to VX.
 void CPU::OP_7XNN(){
-
+	BYTE NN = opcode & 0x00FF;
+	BYTE X  = (opcode >> 8) & 0x000F;
+	V[X] += NN;
 }
 
+// 8XY0	Sets VX to the value of VY.
 void CPU::OP_8XY0(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+	V[X] = V[Y];
 }
 
+
+// 8XY1	Sets VX to VX or VY.
 void CPU::OP_8XY1(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+	V[X] = V[X] or V[Y];
 }
 
+
+// 8XY2	Sets VX to VX and VY.
 void CPU::OP_8XY2(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+	V[X] = V[X] and V[Y];
 }
 
+
+// 8XY3	Sets VX to VX xor VY.
 void CPU::OP_8XY3(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+	V[X] = V[X] xor V[Y];
 }
 
+
+// 8XY4	Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
 void CPU::OP_8XY4(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
 
+	WORD carry = V[X];
+	carry += V[Y];
+	if(static_cast<WORD>(carry) != static_cast<BYTE>(carry))
+		V[0xF] = 1;
+
+	V[X] += V[Y];
 }
 
+
+// 8XY5	VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
 void CPU::OP_8XY5(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
 
+	WORD carry = V[X];
+	carry -= V[Y];
+	if(static_cast<WORD>(carry) != static_cast<BYTE>(carry))
+		V[0xF] = 0;
+	else
+		V[0xF] = 1;
+		
+	V[X] -= V[Y];
 }
 
+
+// 8XY6	Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.[2]
 void CPU::OP_8XY6(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
 
+	BYTE least = (X & 0x1);
+
+	V[X] >>= 1;
+	V[0xF] = least;
 }
 
+
+// 8XY7	Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
 void CPU::OP_8XY7(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
 
+	WORD carry = V[X];
+	carry -= V[Y];
+	if(static_cast<WORD>(carry) != static_cast<BYTE>(carry))
+		V[0xF] = 0;
+	else
+		V[0xF] = 1;
+		
+	V[X] = V[Y] - V[X];
 }
 
+
+// 8XYE	Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.[2]
 void CPU::OP_8XYE(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+	
+	BYTE most = (X & 0b10000000);
 
+	V[X] <<= 1;
+	V[0xF] = most;
 }
 
+// 9XY0	Skips the next instruction if VX doesn't equal VY.
 void CPU::OP_9XY0(){
+	BYTE X = (opcode >> 8) & 0x000F;
+	BYTE Y = (opcode >> 4) & 0x000F;
+
+	if(V[X] != V[Y])
+		pc += 2; 
 
 }
 
+// FX07	Sets VX to the value of the delay timer.
 void CPU::OP_FX07(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	V[X] = delay_timer;
 }
 
+// FX0A	A key press is awaited, and then stored in VX.
 void CPU::OP_FX0A(){
 
 }
 
+// FX15	Sets the delay timer to VX.
 void CPU::OP_FX15(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	delay_timer = V[X];
 }
 
+
+// FX18	Sets the sound timer to VX.
 void CPU::OP_FX18(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	sound_timer = V[X];
 }
 
+
+// FX1E	Adds VX to I.[3]
 void CPU::OP_FX1E(){
-
+	BYTE X = (opcode >> 8) & 0x000F;
+	V[X] = ar;
 }
 
+// FX29	Sets I to the location of the sprite for the character in VX. 
+// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
 void CPU::OP_FX29(){
 
 }
 
+/*
+Stores the Binary-coded decimal representation of VX, with the most significant of three digits at 
+the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. 
+(In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
+the tens digit at location I+1, and the ones digit at location I+2.)
+*/
 void CPU::OP_FX33(){
 
 }
 
+// FX55	Stores V0 to VX in memory starting at address I.[4]
 void CPU::OP_FX55(){
 
 }
 
+// FX65	Fills V0 to VX with values from memory starting at address I.[4]
 void CPU::OP_FX65(){
 
 }
