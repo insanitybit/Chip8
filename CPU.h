@@ -139,7 +139,7 @@ bool CPU::fetch(){
 bool CPU::decode(){
 	WORD op = opcode;
 
-	// std::cout << "op: " << opcode << ";  ";
+	std::cout << "op: " << opcode << ";  ";
 
 	BYTE first 	= ((op >> 12) & 0x000F);
 	BYTE second = ((op >> 8) & 0x000F);
@@ -312,8 +312,10 @@ bool CPU::decode(){
 	return true;
 }
 
+// I'll be decoupling decode and execute later
 bool CPU::execute(){
-	std::cout << pc << "\n";
+	// std::cout << pc << "\n";
+
 	return true;
 }
 
