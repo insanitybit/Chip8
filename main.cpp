@@ -23,15 +23,11 @@ int main(int argc, const char *argv[]){
     init_pair(1, COLOR_WHITE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
 
-    string s(argv[1]); // validate this later
+    string s(argv[1]);
 
     CPU cpu;
     if(!(cpu.load(s)))
       err(0, "load failed");
-
-    string s(argv[1]);
-    CPU cpu;
-    cpu.load(s);
 
     auto dur = std::chrono::microseconds(16670);
 

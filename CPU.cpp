@@ -266,12 +266,7 @@ void CPU::OP_DXYN(){
   for(BYTE i = 0; i < N; i++){
     BYTE temp = memory[I + i];
     for(BYTE j = 0; j < 7; j++){
-<<<<<<< HEAD
-      // gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
-=======
       gfx[(Y + i) % MAX_Y][(X + j) % MAX_X] ^= ((temp >> (7 - j)) & 0b00000001);
-      //gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
->>>>>>> 37c86fe8d97a370541b61b384378b0f4dd40217f
     }
   }
 }
@@ -325,7 +320,7 @@ void CPU::OP_2NNN(){
 // Skips the next instruction if VX equals NN.
 void CPU::OP_3XNN(){
    BYTE NN = (opcode & 0x00FF);
-    BYTE X  = (opcode >> 8) & 0xF;
+   BYTE X  = (opcode >> 8) & 0xF;
    if(NN == V[X])
      pc += 2;
 }
@@ -333,7 +328,7 @@ void CPU::OP_3XNN(){
 // 4XNN	Skips the next instruction if VX doesn't equal NN.
 void CPU::OP_4XNN(){
   BYTE NN = (opcode & 0x00FF);
-    BYTE X  = (opcode >> 8) & 0xF;
+  BYTE X  = (opcode >> 8) & 0xF;
    if(NN != V[X])
      pc += 2;
 }
