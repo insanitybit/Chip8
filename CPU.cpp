@@ -244,7 +244,6 @@ bool CPU::load(const std::string& s){
 void CPU::OP_ANNN(){
   std::cout << "ANNN  NNN == " << (opcode & 0x0FFF) << "\n";
   I = (opcode & 0x0FFF);
-  pc += 2;
 }
 
 // Jumps to the address NNN plus V0
@@ -262,7 +261,6 @@ void CPU::OP_CXNN(){
 
   BYTE reg = (opcode & 0x0F00);
   V[reg] = rd & (opcode & 0x00FF);
-  pc += 2;
 }
 
 /*
@@ -291,8 +289,6 @@ void CPU::OP_DXYN(){
         V[0xF] = 1;
     }
   }
-
-  pc += 2;
 }
 
 // Skips the next instruction if the key stored in VX is pressed.
@@ -300,7 +296,6 @@ void CPU::OP_EX9E(){
   BYTE X = (opcode >> 8) & 0x000F;
   if(keypad[V[X]] == 1)
     pc += 2;
-  pc += 2;
 
   std::cout << "EX9E  X == " << (int)X << "\n";
 }
@@ -311,7 +306,6 @@ void CPU::OP_EXA1(){
   BYTE X = (opcode >> 8) & 0x000F;
   if(keypad[V[X]] != 1)
     pc += 2;
-  pc += 2;
 }
 
 // Calls RCA 1802 program at address NNN.
@@ -327,7 +321,6 @@ void CPU::OP_00E0(){
   for (size_t i = 0; i < MAX_Y; i++) {
     gfx[i].fill(0);
   }
-  pc += 2;
 }
 
 // Returns from a subroutine.
@@ -336,7 +329,6 @@ void CPU::OP_00EE(){
   if(!st.empty()){
     pc = st.top();
     st.pop();
-    pc += 2;
   }
 }
 
@@ -360,7 +352,6 @@ void CPU::OP_3XNN(){
   BYTE X  = (opcode >> 8) & 0xF;
   if(NN == V[X])
     pc += 2;
-  pc += 2;
 
 std::cout << "3XNN  X == " << (int)X << " NN == " << (int)NN << "\n";
 }
@@ -372,7 +363,6 @@ void CPU::OP_4XNN(){
   BYTE X  = (opcode >> 8) & 0xF;
    if(NN != V[X])
      pc += 2;
-   pc += 2;
 }
 
 // 5XY0	Skips the next instruction if VX equals VY.
@@ -383,7 +373,6 @@ void CPU::OP_5XY0(){
 
   if(V[X] == V[Y])
     pc += 2;
-  pc += 2;
 
 }
 
@@ -392,7 +381,6 @@ void CPU::OP_6XNN(){
   BYTE NN = opcode & 0x00FF;
   BYTE X  = (opcode >> 8) & 0x000F;
   V[X] = NN;
-  pc += 2;
 
   std::cout << "6XNN  X == " << (int)X << " NN == " << (int)NN << "\n";
 }
@@ -402,7 +390,6 @@ void CPU::OP_7XNN(){
   BYTE NN = opcode & 0x00FF;
   BYTE X  = (opcode >> 8) & 0x000F;
   V[X] += NN;
-  pc += 2;
 
   std::cout << "7XNN  X == " << (int)X << " NN == " << (int)NN << "\n";
 }
@@ -413,7 +400,6 @@ void CPU::OP_8XY0(){
    BYTE X = (opcode >> 8) & 0x000F;
    BYTE Y = (opcode >> 4) & 0x000F;
    V[X] = V[Y];
-   pc += 2;
 }
 
 
@@ -423,7 +409,6 @@ void CPU::OP_8XY1(){
    BYTE X = (opcode >> 8) & 0x000F;
    BYTE Y = (opcode >> 4) & 0x000F;
    V[X] = V[X] or V[Y];
-   pc += 2;
 }
 
 
@@ -433,7 +418,6 @@ void CPU::OP_8XY2(){
   BYTE X = (opcode >> 8) & 0x000F;
   BYTE Y = (opcode >> 4) & 0x000F;
   V[X] = V[X] and V[Y];
-  pc += 2;
 }
 
 
@@ -443,7 +427,6 @@ void CPU::OP_8XY3(){
   BYTE X = (opcode >> 8) & 0x000F;
   BYTE Y = (opcode >> 4) & 0x000F;
   V[X] = V[X] xor V[Y];
-  pc += 2;
 }
 
 
@@ -457,7 +440,6 @@ void CPU::OP_8XY4(){
     V[0xF] = 1;
 
   V[X] += V[Y];
-  pc += 2;
 }
 
 
@@ -471,7 +453,6 @@ void CPU::OP_8XY5(){
     V[0xF] = 0;
 
   V[X] -= V[Y];
-  pc += 2;
 }
 
 
@@ -483,7 +464,6 @@ void CPU::OP_8XY6(){
 
   V[0xF] = V[X] & 0x1;
   V[X] >>= 1;
-  pc += 2;
 }
 
 
@@ -497,7 +477,6 @@ void CPU::OP_8XY7(){
     V[0xF] = 0;
 
   V[X] = V[Y] - V[X];
-  pc += 2;
 }
 
 
@@ -511,7 +490,6 @@ void CPU::OP_8XYE(){
 
   V[X] <<= 1;
   V[0xF] = most;
-  pc += 2;
 }
 
 // 9XY0	Skips the next instruction if VX doesn't equal VY.
@@ -522,7 +500,6 @@ void CPU::OP_9XY0(){
 
   if(V[X] != V[Y])
     pc += 2;
-  pc += 2;
 }
 
 // FX07	Sets VX to the value of the delay timer.
@@ -530,7 +507,6 @@ void CPU::OP_FX07(){
   std::cout << "FX07  ";
   BYTE X = (opcode >> 8) & 0x000F;
   V[X] = delay_timer;
-  pc += 2;
 }
 
 // FX0A	A key press is awaited, and then stored in VX.
@@ -546,8 +522,8 @@ void CPU::OP_FX0A(){
       break;
     }
   }
-  if(pressed)
-    pc += 2;
+  if(!pressed)
+    pc -= 2;
 }
 
 // FX15	Sets the delay timer to VX.
@@ -555,7 +531,6 @@ void CPU::OP_FX15(){
   std::cout << "FX15  ";
   BYTE X = (opcode >> 8) & 0x000F;
   delay_timer = V[X];
-  pc += 2;
 }
 
 
@@ -564,7 +539,6 @@ void CPU::OP_FX18(){
   std::cout << "FX18  ";
   BYTE X = (opcode >> 8) & 0x000F;
   sound_timer = V[X];
-  pc += 2;
 }
 
 
@@ -573,7 +547,6 @@ void CPU::OP_FX1E(){
   std::cout << "FX1E  ";
   BYTE X = (opcode >> 8) & 0x000F;
   I += V[X];
-  pc += 2;
 }
 
 // FX29	Sets I to the location of the sprite for the character in VX.
@@ -581,7 +554,6 @@ void CPU::OP_FX1E(){
 void CPU::OP_FX29(){
   BYTE X = (opcode >> 8) & 0x000F;
   I = V[X] * 5;
-  pc += 2;
 
   std::cout << "FX29  X == " << X;
 }
@@ -608,7 +580,6 @@ void CPU::OP_FX33(){
   memory[I] = hundreds;
   memory[I+1] = tens;
   memory[I+2] = ones;
-  pc += 2;
 }
 
 // FX55	Stores V0 to VX in memory starting at address I.[4]
@@ -617,7 +588,6 @@ void CPU::OP_FX55(){
   BYTE X = (opcode >> 8) & 0x000F;
   for(BYTE i = 0; i <= X; i++)
     memory[m++] = V[i];
-  pc += 2;
 
   std::cout << "FX55  X == " << X;
 }
@@ -628,7 +598,6 @@ void CPU::OP_FX65(){
   BYTE X = (opcode >> 8) & 0x000F;
   for(BYTE i = 0; i <= X; i++)
     V[i] = 	memory[m++];
-  pc += 2;
 
   std::cout << "FX65  X == " << X;
 }

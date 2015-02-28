@@ -16,7 +16,7 @@ void gfx_update(std::array<std::array<BYTE, 64>, 32>&);
 int main(int argc, const char *argv[]){
     if(argc < 2)
       err(0, "Need path to game file");
-
+    //
     // initscr();
     // start_color();
     // curs_set(0);
