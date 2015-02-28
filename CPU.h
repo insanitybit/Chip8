@@ -15,13 +15,13 @@ class CPU
 {
 public:
 		bool load(const std::string&);
-		void cycle();
+		bool cycle();
 		size_t cycle_count();
 		std::array<std::array<BYTE, 64>, 32>& get_gfx();
 
 private:
 		void fetch();
-		void decode();
+ 		int decode();
 		void execute();
 
 		size_t cycles;
