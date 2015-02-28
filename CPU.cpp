@@ -262,11 +262,18 @@ void CPU::OP_DXYN(){
   BYTE N = opcode        & 0x000F;
   BYTE X = (opcode >> 8) & 0x000F;
   BYTE Y = (opcode >> 4) & 0x000F;
+  BYTE thisX, thisY;
+  V[0xF] = 0;
 
   for(BYTE i = 0; i < N; i++){
     BYTE temp = memory[I + i];
     for(BYTE j = 0; j < 7; j++){
-      gfx[(Y + i) % MAX_Y][(X + j) % MAX_X] ^= ((temp >> (7 - j)) & 0b00000001);
+      thisX = (X + j) % MAX_X;
+      thisY = (Y + i) % MAX_Y;
+      oldstatus = gfx[thisY][thisX];
+      gfx[thisY][thisX] ^= ((temp >> (7 - j)) & 0b00000001);
+      if((oldstatus == 1) && gfx[thisY][thisX] == 0)
+        V[0xF] = 1;
     }
   }
 }
