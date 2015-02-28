@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <chrono>
 #include <thread>
+#include <err.h>
 
 using namespace std;
 
@@ -10,9 +11,11 @@ using namespace std;
 #define MAX_X 64
 #define MAX_Y 32
 
-void gfx_update(std::array<BYTE, 2048>&);
+void gfx_update(std::array<std::array<BYTE, 64>, 32>&);
 
 int main(int argc, const char *argv[]){
+    if(argc < 2)
+      err(0, "Need path to game file");
 
     initscr();
     start_color();
@@ -20,8 +23,14 @@ int main(int argc, const char *argv[]){
     init_pair(1, COLOR_WHITE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
 
+
+
+    string s(argv[1]); // validate this later
+
     CPU cpu;
-    cpu.load("PONG");
+    if(!(cpu.load(s)))
+      err(0, "load failed");
+
 
     auto dur = std::chrono::microseconds(16670);
 
@@ -34,13 +43,13 @@ int main(int argc, const char *argv[]){
     endwin();
 }
 
-void gfx_update(std::array<BYTE, 2048>& gfx){
+void gfx_update(std::array<std::array<BYTE, 64>, 32>& gfx){
       clear();
-      for(int x = 0; x <  64; x++){
-          for(int y = 0; y < 32; y++){
-              if(gfx[(MAX_X * y) + x]){
-                  mvaddch(y, x, ' ');
-              }
-          }
-      }
+      // for(int x = 0; x <  64; x++){
+      //     for(int y = 0; y < 32; y++){
+      //         if(gfx[(MAX_X * y) + x]){
+      //             mvaddch(y, x, ' ');
+      //         }
+      //     }
+      // }
 }

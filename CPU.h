@@ -15,10 +15,10 @@ typedef uint16_t WORD;
 class CPU
 {
 public:
-		void load(const std::string&);
+		bool load(const std::string&);
 		void cycle();
 		size_t cycle_count();
-		std::array<BYTE, 2048>& get_gfx();
+		std::array<std::array<BYTE, 64>, 32>& get_gfx();
 
 private:
 		void fetch();
@@ -41,7 +41,8 @@ private:
 		WORD delay_timer;
 
 		std::array<BYTE, 16> keypad;
-		std::array<BYTE, 64 * 32> gfx;
+		// std::array<BYTE, 64 * 32> gfx;
+		std::array<std::array<BYTE, 64>, 32> gfx;
 		BYTE MAX_X = 64;
 		BYTE MAX_Y = 32;
 

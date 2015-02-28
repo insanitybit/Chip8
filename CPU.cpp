@@ -3,7 +3,7 @@
 
 #include "CPU.h"
 
-std::array<BYTE, 2048>& CPU::get_gfx(){
+std::array<std::array<BYTE, 64>, 32>& CPU::get_gfx(){
   return this->gfx;
 }
 
@@ -207,9 +207,13 @@ size_t CPU::cycle_count(){
   return this->cycles;
 }
 
-void CPU::load(const std::string& s){
-    pc = 0x200;
-    std::ifstream file(s);
+bool CPU::load(const std::string& s){
+  pc = 0x200;
+  bool b = true;
+  std::ifstream file(s);
+
+  if(!file)
+    b = false;
 
   file.seekg( 0, std::ios::end );
   psize = file.tellg();
@@ -218,6 +222,8 @@ void CPU::load(const std::string& s){
   file.read(reinterpret_cast<char *>(&memory[pc]), psize);
 
   file.close();
+
+  return b;
 
 }
 
@@ -260,7 +266,7 @@ void CPU::OP_DXYN(){
   for(BYTE i = 0; i < N; i++){
     BYTE temp = memory[I + i];
     for(BYTE j = 0; j < 7; j++){
-      gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
+      // gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
     }
   }
 }
@@ -286,7 +292,9 @@ void CPU::OP_0NNN(){
 
 // Clears the screen.
 void CPU::OP_00E0(){
-  gfx.fill(0);
+  for (size_t i = 0; i < MAX_Y; i++) {
+    gfx[i].fill(0);
+  }
 }
 
 // Returns from a subroutine.
