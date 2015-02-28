@@ -19,9 +19,10 @@ int main(int argc, const char *argv[]){
     curs_set(0);
     init_pair(1, COLOR_WHITE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
-
+    
+    string s(argv[1]);
     CPU cpu;
-    cpu.load("PONG");
+    cpu.load(s);
 
     auto dur = std::chrono::microseconds(16670);
 
@@ -38,7 +39,7 @@ void gfx_update(std::array<BYTE, 2048>& gfx){
       clear();
       for(int x = 0; x <  64; x++){
           for(int y = 0; y < 32; y++){
-              if(gfx[(MAX_X * y) + x]){
+              if(gfx[y][x]){
                   mvaddch(y, x, ' ');
               }
           }

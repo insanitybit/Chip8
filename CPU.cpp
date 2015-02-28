@@ -260,7 +260,8 @@ void CPU::OP_DXYN(){
   for(BYTE i = 0; i < N; i++){
     BYTE temp = memory[I + i];
     for(BYTE j = 0; j < 7; j++){
-      gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
+      gfx[(Y + i) % MAX_Y][(X + j) % MAX_X] ^= ((temp >> (7 - j)) & 0b00000001);
+      //gfx[(MAX_X * ((Y + i) % MAX_Y)) + ((X + j) % MAX_X)] ^= ((temp >> (7 - j)) & 0b00000001);
     }
   }
 }
