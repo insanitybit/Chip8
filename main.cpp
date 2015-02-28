@@ -23,14 +23,15 @@ int main(int argc, const char *argv[]){
     init_pair(1, COLOR_WHITE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
 
-
-
     string s(argv[1]); // validate this later
 
     CPU cpu;
     if(!(cpu.load(s)))
       err(0, "load failed");
 
+    string s(argv[1]);
+    CPU cpu;
+    cpu.load(s);
 
     auto dur = std::chrono::microseconds(16670);
 
@@ -45,11 +46,11 @@ int main(int argc, const char *argv[]){
 
 void gfx_update(std::array<std::array<BYTE, 64>, 32>& gfx){
       clear();
-      // for(int x = 0; x <  64; x++){
-      //     for(int y = 0; y < 32; y++){
-      //         if(gfx[(MAX_X * y) + x]){
-      //             mvaddch(y, x, ' ');
-      //         }
-      //     }
-      // }
+      for(int x = 0; x <  64; x++){
+          for(int y = 0; y < 32; y++){
+              if(gfx[y][x]){
+                  mvaddch(y, x, ' ');
+              }
+          }
+      }
 }
