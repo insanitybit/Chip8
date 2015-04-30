@@ -7,6 +7,7 @@
 #include <fstream>
 #include <functional>
 #include <random>
+#include <SDL2/SDL.h>
 
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
@@ -14,36 +15,62 @@ typedef uint16_t WORD;
 class CPU
 {
 public:
-		bool load(const std::string&);
-		bool cycle();
-		size_t cycle_count();
-		std::array<std::array<BYTE, 64>, 32>& get_gfx();
+	CPU();
+	~CPU();
+	bool load(const std::string&);
+	bool cycle();
+	void setKeys();
+
+	size_t cycle_count();
+	std::array<std::array<BYTE, 64>, 32>& get_gfx();
 
 private:
-		void fetch();
- 		int decode();
-		void execute();
+	void fetch();
+	int decode();
+	void execute();
 
-		size_t cycles;
+	SDL_Event event; 
 
-		std::array<BYTE, 4096> memory = {};
-		std::array<BYTE, 16> V = {};
+	size_t cycles;
 
-		WORD I;
-		WORD pc;
-		WORD psize; // size of binary
-		WORD opcode;
+	std::array<BYTE, 4096> memory = {};
+	std::array<BYTE, 16> V = {};
 
-		std::stack<WORD> st;
+	WORD I;
+	WORD pc;
+	WORD psize; // size of binary
+	WORD opcode;
 
-		WORD sound_timer;
-		WORD delay_timer;
+	std::stack<WORD> st;
 
-		std::array<BYTE, 16> keypad;
-		// std::array<BYTE, 64 * 32> gfx;
-		std::array<std::array<BYTE, 64>, 32> gfx;
-		BYTE MAX_X = 64;
-		BYTE MAX_Y = 32;
+	WORD sound_timer;
+	WORD delay_timer;
+
+	std::array<BYTE, 16> keypad;
+	// std::array<BYTE, 64 * 32> gfx;
+	std::array<std::array<BYTE, 64>, 32> gfx;
+	BYTE MAX_X = 64;
+	BYTE MAX_Y = 32;
+
+	std::array<BYTE, 80> fontset = { {
+		0xF0, 0x90, 0x90, 0x90, 0xF0,
+		0x20, 0x60, 0x20, 0x20, 0x70,
+		0xF0, 0x10, 0xF0, 0x80, 0xF0,
+		0xF0, 0x10, 0xF0, 0x10, 0xF0,
+		0x90, 0x90, 0xF0, 0x10, 0x10,
+		0xF0, 0x80, 0xF0, 0x10, 0xF0,
+		0xF0, 0x80, 0xF0, 0x90, 0xF0,
+		0xF0, 0x10, 0x20, 0x40, 0x40,
+		0xF0, 0x90, 0xF0, 0x90, 0xF0,
+		0xF0, 0x90, 0xF0, 0x10, 0xF0,
+		0xF0, 0x90, 0xF0, 0x90, 0x90,
+		0xE0, 0x90, 0xE0, 0x90, 0xE0,
+		0xF0, 0x80, 0x80, 0x80, 0xF0,
+		0xE0, 0x90, 0x90, 0x90, 0xE0,
+		0xF0, 0x80, 0xF0, 0x80, 0xF0,
+		0xF0, 0x80, 0xF0, 0x80, 0x80 
+	}
+	};
 
 	std::mt19937 gen{std::random_device{}()};
 
